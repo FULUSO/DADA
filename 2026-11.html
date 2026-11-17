@@ -1,0 +1,2040 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="artifact-type" content="narrative">
+  <meta name="design-style" content="nocturne">
+  <title>星象轉折觀測誌：水逆倒數與行星順逆解析</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..700;1,400..600&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;600;700&family=Noto+Serif+TC:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@1.43.0/dist/umd/lucide.min.js"></script>
+  <style>
+    :root {
+      color-scheme: dark;
+
+      /* Page and surfaces: Prussian midnight steps */
+      --background: #0a101d;
+      --surface-container-low: #0e1626;
+      --surface-container: #111b2e;
+      --surface-container-high: #17243c;
+
+      /* Text */
+      --on-surface: #f2ece1;
+      --on-surface-variant: #9ba8bf;
+
+      /* Borders */
+      --outline: #384d73;
+      --outline-variant: #21304d;
+
+      /* Accents */
+      --primary: #dfaa5b;
+      --on-primary: #0a101d;
+      --primary-container: #2b261c;
+      --on-primary-container: #f5dcb0;
+      --secondary: #687a99;
+      --tertiary: #7cc4e8;
+      --error: #f27474;
+      --on-error: #1a0606;
+
+      /* Data series */
+      --data-1: #dfaa5b;
+      --data-2: #7cc4e8;
+      --data-3: #52d19c;
+      --data-4: #e07a5f;
+      --data-context: #4a5d80;
+
+      /* Fonts (CJK families first, paired with Nocturne typography) */
+      --font-headline: 'Noto Serif TC', 'EB Garamond', serif;
+      --font-body: 'Noto Sans TC', 'Plus Jakarta Sans', sans-serif;
+      --font-label: 'JetBrains Mono', 'Noto Sans TC', monospace;
+
+      /* Shape */
+      --rounded: 0.25rem;
+      --rounded-lg: 0.375rem;
+      --rounded-full: 9999px;
+
+      /* Style effects */
+      --hairline: 1px solid var(--outline-variant);
+      --hairline-strong: 1px solid var(--outline);
+      --panel-highlight: inset 0 1px 0 rgba(242, 236, 225, 0.05);
+      --brass-glow: radial-gradient(circle at 88% 12%, rgba(223, 170, 91, 0.08), transparent 45%);
+      --heading-tracking: -0.015em;
+      --label-tracking: 0.06em;
+      --sky-tint: color-mix(in srgb, var(--tertiary) 12%, transparent);
+      --brass-tint: color-mix(in srgb, var(--primary) 14%, transparent);
+      --mint-tint: color-mix(in srgb, var(--data-3) 12%, transparent);
+      --coral-tint: color-mix(in srgb, var(--data-4) 14%, transparent);
+      --sky-border: 1px solid color-mix(in srgb, var(--tertiary) 35%, transparent);
+      --brass-border: 1px solid color-mix(in srgb, var(--primary) 40%, transparent);
+      --mint-border: 1px solid color-mix(in srgb, var(--data-3) 38%, transparent);
+      --coral-border: 1px solid color-mix(in srgb, var(--data-4) 42%, transparent);
+
+      /* Shared semantic tokens */
+      --positive: #52d19c;
+      --warning: #e07a5f;
+      --focus: var(--primary);
+
+      /* Narrative type scale */
+      --display-size: clamp(2.25rem, 1.4rem + 3.2vw, 3.75rem);
+      --headline-size: clamp(1.65rem, 1.2rem + 1.6vw, 2.35rem);
+      --subhead-size: clamp(1.15rem, 1.05rem + 0.45vw, 1.375rem);
+      --body-size: clamp(1rem, 0.96rem + 0.2vw, 1.1rem);
+      --label-size: clamp(0.75rem, 0.72rem + 0.12vw, 0.8125rem);
+
+      /* Spacing scale */
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2.5rem;
+      --space-2xl: 4rem;
+      --space-3xl: 6rem;
+
+      /* Motion */
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+      --dur-micro: 120ms;
+      --dur-short: 220ms;
+      --dur-medium: 320ms;
+      --dur-long: 420ms;
+    }
+
+    /* Base reset */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      overflow-x: clip;
+      margin: 0;
+      padding: 0;
+      background-color: var(--background);
+      color: var(--on-surface);
+      font-family: var(--font-body);
+      font-size: var(--body-size);
+      line-height: 1.65;
+      scroll-behavior: smooth;
+    }
+    header { position: static !important; }
+
+    button, input, select, textarea {
+      font-family: inherit;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .page-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-2xl);
+      padding: var(--space-xl) var(--space-lg) var(--space-3xl);
+      max-width: 1180px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+    .page-grid * { min-width: 0; }
+
+    /* Hero Header */
+    .hero-header {
+      background-color: var(--background);
+      background-image: var(--brass-glow);
+      border-bottom: var(--hairline);
+      padding: var(--space-2xl) var(--space-lg) var(--space-xl);
+    }
+
+    .hero-inner {
+      max-width: 1180px;
+      margin: 0 auto;
+      display: grid;
+      gap: var(--space-lg);
+    }
+
+    .coord-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-sm) var(--space-md);
+    }
+
+    .coord-label {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      letter-spacing: var(--label-tracking);
+      text-transform: uppercase;
+      color: var(--tertiary);
+    }
+
+    .coord-label-cjk {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      letter-spacing: 0;
+      text-transform: none;
+      color: var(--on-surface-variant);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      background: var(--sky-tint);
+      color: var(--tertiary);
+      border: var(--sky-border);
+      border-radius: var(--rounded);
+      padding: var(--space-xs) var(--space-sm);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      line-height: 1.3;
+    }
+
+    .badge-brass {
+      background: var(--brass-tint);
+      color: var(--primary);
+      border: var(--brass-border);
+    }
+
+    .badge-mint {
+      background: var(--mint-tint);
+      color: var(--positive);
+      border: var(--mint-border);
+    }
+
+    .badge-coral {
+      background: var(--coral-tint);
+      color: var(--warning);
+      border: var(--coral-border);
+    }
+
+    .title {
+      font-family: var(--font-headline);
+      font-weight: 500;
+      font-size: var(--display-size);
+      letter-spacing: 0;
+      line-height: 1.18;
+      color: var(--on-surface);
+      margin: 0;
+      max-width: 24ch;
+    }
+
+    .title em {
+      font-style: italic;
+      font-weight: 400;
+      color: var(--primary);
+    }
+
+    .deck-brass {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      letter-spacing: var(--label-tracking);
+      text-transform: uppercase;
+      color: var(--primary);
+      margin: 0;
+    }
+
+    .lede {
+      max-width: 65ch;
+      color: var(--on-surface-variant);
+      margin: 0;
+      font-size: var(--subhead-size);
+      line-height: 1.62;
+    }
+
+    .lede strong {
+      color: var(--on-surface);
+      font-weight: 600;
+    }
+
+    /* Telemetry summary strip */
+    .telemetry-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: var(--space-md);
+      margin-top: var(--space-sm);
+    }
+
+    .panel {
+      background: var(--surface-container);
+      border: var(--hairline);
+      box-shadow: var(--panel-highlight);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-lg);
+    }
+
+    .panel-low {
+      background: var(--surface-container-low);
+      border: var(--hairline);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-lg);
+    }
+
+    .telemetry-tile {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+      padding: var(--space-md) var(--space-lg);
+    }
+
+    .telemetry-date {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      color: var(--tertiary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .telemetry-value {
+      font-family: var(--font-headline);
+      font-weight: 500;
+      font-size: var(--subhead-size);
+      color: var(--on-surface);
+      line-height: 1.3;
+    }
+
+    .telemetry-note {
+      font-size: 0.875rem;
+      color: var(--on-surface-variant);
+      line-height: 1.45;
+    }
+
+    /* Anchor navigation index inside main */
+    .anchor-index {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-sm) var(--space-md);
+      background: var(--surface-container-low);
+      border: var(--hairline);
+      border-radius: var(--rounded-lg);
+    }
+
+    .anchor-index-label {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      color: var(--primary);
+      margin-right: var(--space-sm);
+    }
+
+    .anchor-link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      padding: var(--space-xs) var(--space-md);
+      border-radius: var(--rounded);
+      color: var(--tertiary);
+      text-decoration: none;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      transition: background-color var(--dur-short) var(--ease-out), color var(--dur-short) var(--ease-out);
+    }
+
+    .anchor-link:hover {
+      background: var(--surface-container-high);
+      color: var(--on-surface);
+      text-decoration: underline;
+    }
+
+    /* Section Header */
+    .section-block {
+      display: grid;
+      gap: var(--space-lg);
+    }
+
+    .section-head {
+      display: grid;
+      gap: var(--space-xs);
+      padding-bottom: var(--space-md);
+      border-bottom: var(--hairline);
+    }
+
+    .section-kicker {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      letter-spacing: var(--label-tracking);
+      text-transform: uppercase;
+      color: var(--primary);
+    }
+
+    .section-title {
+      font-family: var(--font-headline);
+      font-weight: 500;
+      font-size: var(--headline-size);
+      line-height: 1.22;
+      color: var(--on-surface);
+      margin: 0;
+    }
+
+    .section-intro {
+      max-width: 65ch;
+      color: var(--on-surface-variant);
+      margin: var(--space-xs) 0 0;
+    }
+
+    /* Observation well */
+    .observation-well {
+      background: var(--background);
+      border: var(--hairline);
+      border-radius: var(--rounded);
+      padding: var(--space-md);
+      color: var(--on-surface);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+      min-height: 44px;
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--rounded);
+      font-family: var(--font-body);
+      font-size: 0.9375rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: var(--hairline-strong);
+      background: transparent;
+      color: var(--on-surface);
+      transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out), box-shadow var(--dur-micro) var(--ease-out);
+    }
+
+    .btn:hover:not(:disabled) {
+      background: var(--surface-container-high);
+    }
+
+    .btn:active:not(:disabled) {
+      transform: translateY(1px);
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: var(--on-primary);
+      border-color: var(--primary);
+      font-weight: 600;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--on-primary-container);
+      color: var(--on-primary);
+    }
+
+    .btn-tab-active {
+      background: var(--primary);
+      color: var(--on-primary);
+      border-color: var(--primary);
+      font-weight: 600;
+    }
+
+    .btn-tab-active:hover:not(:disabled) {
+      background: var(--primary);
+      color: var(--on-primary);
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      align-items: center;
+    }
+
+    /* Section 1: Orbital Lab */
+    .orbital-lab {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+      gap: var(--space-lg);
+      align-items: stretch;
+    }
+
+    .orbital-stage {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+
+    .orbital-svg-wrap {
+      width: 100%;
+      min-height: 290px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .orbital-svg {
+      width: 100%;
+      height: auto;
+      max-height: 310px;
+      display: block;
+    }
+
+    .svg-grid-line { stroke: var(--outline-variant); stroke-width: 1; stroke-dasharray: 3 4; }
+    .svg-axis-line { stroke: var(--outline); stroke-width: 1; }
+    .svg-path-base { stroke: var(--data-context); stroke-width: 2; fill: none; }
+    .svg-path-active { stroke: var(--primary); stroke-width: 2.5; fill: none; }
+    .svg-node-muted { fill: var(--surface-container-high); stroke: var(--outline); stroke-width: 1.5; }
+    .svg-node-direct { fill: var(--data-3); stroke: var(--background); stroke-width: 2; }
+    .svg-node-stationary { fill: var(--data-1); stroke: var(--background); stroke-width: 2; }
+    .svg-node-retro { fill: var(--data-4); stroke: var(--background); stroke-width: 2; }
+    .svg-label-mono {
+      fill: var(--on-surface-variant);
+      font-family: var(--font-label);
+      font-size: 11px;
+    }
+    .svg-label-sky {
+      fill: var(--tertiary);
+      font-family: var(--font-label);
+      font-size: 11px;
+    }
+    .svg-label-brass {
+      fill: var(--primary);
+      font-family: var(--font-label);
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .state-detail-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: var(--space-md);
+    }
+
+    .state-meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .state-title {
+      font-family: var(--font-headline);
+      font-size: var(--subhead-size);
+      font-weight: 600;
+      margin: 0;
+      color: var(--on-surface);
+    }
+
+    .kv-list {
+      display: grid;
+      gap: var(--space-md);
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .kv-item {
+      border-top: var(--hairline);
+      padding-top: var(--space-sm);
+    }
+
+    .kv-term {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      color: var(--tertiary);
+      margin-bottom: var(--space-xs);
+    }
+
+    .kv-desc {
+      margin: 0;
+      color: var(--on-surface);
+      font-size: 0.96875rem;
+    }
+
+    .three-states-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-md);
+    }
+
+    .state-summary-card {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+      cursor: pointer;
+      transition: background-color var(--dur-short) var(--ease-out), border-color var(--dur-short) var(--ease-out);
+    }
+
+    .state-summary-card:hover {
+      background: var(--surface-container-high);
+    }
+
+    .state-summary-card.is-selected {
+      background: var(--surface-container-high);
+      box-shadow: 0 0 0 1px var(--primary), var(--panel-highlight);
+    }
+
+    /* Section 2: Timeline Chart + Table + 4 Major Events */
+    .timeline-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.65fr);
+      gap: var(--space-lg);
+      align-items: stretch;
+    }
+
+    .chart-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-md);
+      margin-bottom: var(--space-sm);
+      font-size: 0.875rem;
+      color: var(--on-surface-variant);
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+
+    .legend-swatch {
+      width: 14px;
+      height: 3px;
+      border-radius: var(--rounded-full);
+      display: inline-block;
+    }
+
+    .swatch-coral { background: var(--data-4); }
+    .swatch-brass { background: var(--data-1); }
+    .swatch-sky { background: var(--data-2); }
+
+    .timeline-svg {
+      width: 100%;
+      height: auto;
+      min-height: 250px;
+      display: block;
+    }
+
+    .svg-tension-line {
+      stroke: var(--data-4);
+      stroke-width: 2;
+      fill: none;
+    }
+
+    .svg-clarity-line {
+      stroke: var(--data-1);
+      stroke-width: 2.25;
+      fill: none;
+    }
+
+    .svg-clarity-area {
+      fill: color-mix(in srgb, var(--data-1) 10%, transparent);
+    }
+
+    .timeline-node-btn {
+      cursor: pointer;
+    }
+
+    .timeline-node-hit {
+      fill: transparent;
+      cursor: pointer;
+    }
+
+    .timeline-node-ring {
+      fill: none;
+      stroke: var(--primary);
+      stroke-width: 1.5;
+      opacity: 0;
+      transition: opacity var(--dur-micro) var(--ease-out);
+    }
+
+    .timeline-node-btn.is-active .timeline-node-ring,
+    .timeline-node-btn:hover .timeline-node-ring {
+      opacity: 1;
+    }
+
+    .epoch-inspector {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: var(--space-md);
+    }
+
+    .epoch-pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-xs);
+    }
+
+    .epoch-chip {
+      min-height: 44px;
+      padding: var(--space-xs) var(--space-sm);
+      border-radius: var(--rounded);
+      border: var(--hairline);
+      background: var(--surface-container-low);
+      color: var(--on-surface-variant);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      cursor: pointer;
+      transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out);
+    }
+
+    .epoch-chip:hover {
+      background: var(--surface-container-high);
+      color: var(--on-surface);
+    }
+
+    .epoch-chip.is-active {
+      background: var(--brass-tint);
+      color: var(--primary);
+      border-color: var(--primary);
+    }
+
+    /* Tables */
+    .table-scroll {
+      width: 100%;
+      overflow-x: auto;
+      border: var(--hairline);
+      border-radius: var(--rounded-lg);
+      background: var(--surface-container);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9375rem;
+    }
+
+    thead th {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      font-weight: 600;
+      color: var(--tertiary);
+      background: var(--surface-container-low);
+      padding: var(--space-md);
+      border-bottom: var(--hairline-strong);
+      white-space: nowrap;
+    }
+
+    tbody td {
+      padding: var(--space-md);
+      border-bottom: var(--hairline);
+      vertical-align: top;
+      color: var(--on-surface);
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr.is-highlighted {
+      background: var(--surface-container-high);
+    }
+
+    tbody tr.is-dimmed {
+      opacity: 0.42;
+    }
+
+    .td-mono {
+      font-family: var(--font-label);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      color: var(--primary);
+      font-size: 0.875rem;
+    }
+
+    .td-title {
+      font-weight: 600;
+      color: var(--on-surface);
+      white-space: nowrap;
+    }
+
+    /* 4 Major Events asymmetric 2x2 grid */
+    .events-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+      gap: var(--space-lg);
+    }
+
+    .event-card {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+
+    .event-card-head {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: var(--space-sm);
+      border-bottom: var(--hairline);
+      padding-bottom: var(--space-sm);
+    }
+
+    .event-card-title {
+      font-family: var(--font-headline);
+      font-size: var(--subhead-size);
+      font-weight: 600;
+      margin: 0;
+      color: var(--on-surface);
+    }
+
+    .clean-list {
+      margin: 0;
+      padding-left: 1.2rem;
+      display: grid;
+      gap: var(--space-xs);
+      color: var(--on-surface-variant);
+    }
+
+    .clean-list strong {
+      color: var(--on-surface);
+    }
+
+    /* Section 3: Elements Matrix + Dual Sign Synthesizer */
+    .element-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-lg);
+    }
+
+    .element-card {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+      transition: opacity var(--dur-short) var(--ease-out), background-color var(--dur-short) var(--ease-out);
+    }
+
+    .element-card.is-dimmed {
+      opacity: 0.38;
+    }
+
+    .element-card.is-focused {
+      background: var(--surface-container-high);
+      box-shadow: 0 0 0 1px var(--primary), var(--panel-highlight);
+    }
+
+    .synthesizer-panel {
+      display: grid;
+      gap: var(--space-lg);
+      background: var(--surface-container-low);
+      border: var(--hairline-strong);
+      border-radius: var(--rounded-lg);
+      padding: var(--space-xl);
+      box-shadow: var(--panel-highlight);
+    }
+
+    .synth-controls {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+      gap: var(--space-md);
+      align-items: end;
+    }
+
+    .field-group {
+      display: grid;
+      gap: var(--space-xs);
+    }
+
+    .field-label {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      color: var(--tertiary);
+      display: block;
+    }
+
+    .select-input {
+      width: 100%;
+      min-height: 44px;
+      padding: var(--space-sm) 2.25rem var(--space-sm) var(--space-md);
+      background-color: var(--background);
+      color: var(--on-surface);
+      border: var(--hairline-strong);
+      border-radius: var(--rounded);
+      font-size: 0.9375rem;
+      appearance: none;
+      background-image: linear-gradient(45deg, transparent 50%, var(--primary) 50%),
+                        linear-gradient(135deg, var(--primary) 50%, transparent 50%);
+      background-position: calc(100% - 18px) 50%, calc(100% - 12px) 50%;
+      background-size: 6px 6px, 6px 6px;
+      background-repeat: no-repeat;
+      cursor: pointer;
+    }
+
+    .synth-output {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: var(--space-md);
+    }
+
+    .synth-box {
+      background: var(--surface-container);
+      border: var(--hairline);
+      border-radius: var(--rounded);
+      padding: var(--space-md);
+      display: grid;
+      gap: var(--space-xs);
+    }
+
+    .synth-full {
+      grid-column: 1 / -1;
+      background: var(--primary-container);
+      border: var(--brass-border);
+      color: var(--on-primary-container);
+    }
+
+    /* Section 4: Deep Case Studies */
+    .cases-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-lg);
+      align-items: start;
+    }
+
+    .case-dossier {
+      display: grid;
+      gap: var(--space-md);
+    }
+
+    .case-subblock {
+      border-top: var(--hairline);
+      padding-top: var(--space-md);
+      display: grid;
+      gap: var(--space-sm);
+    }
+
+    .case-subhead {
+      font-family: var(--font-headline);
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin: 0;
+      color: var(--primary);
+    }
+
+    .quick-read-box {
+      background: var(--background);
+      border: var(--brass-border);
+      border-radius: var(--rounded);
+      padding: var(--space-md);
+      display: grid;
+      gap: var(--space-xs);
+    }
+
+    .quick-read-title {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      color: var(--primary);
+      margin: 0;
+    }
+
+    /* Footer */
+    .colophon {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: var(--space-xl) var(--space-lg);
+      border-top: var(--hairline);
+      color: var(--on-surface-variant);
+      font-size: 0.875rem;
+      display: grid;
+      gap: var(--space-xs);
+    }
+
+    .colophon-label {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      color: var(--tertiary);
+    }
+
+    /* Reveal animation */
+    .reveal-item {
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity var(--dur-long) var(--ease-out), transform var(--dur-long) var(--ease-out);
+    }
+    .reveal-item.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 920px) {
+      .telemetry-strip {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .orbital-lab,
+      .timeline-layout,
+      .events-grid,
+      .cases-grid,
+      .synth-controls {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .three-states-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page-grid {
+        padding: var(--space-lg) var(--space-md) var(--space-2xl);
+        gap: var(--space-xl);
+      }
+      .hero-header {
+        padding: var(--space-xl) var(--space-md) var(--space-lg);
+      }
+      .telemetry-strip,
+      .element-grid,
+      .synth-output {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .synthesizer-panel {
+        padding: var(--space-md);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+      .reveal-item {
+        opacity: 1 !important;
+        transform: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="hero-header">
+    <div class="hero-inner">
+      <div class="coord-row">
+        <span class="coord-label">OBSERVATORY BRIEF // EPOCH 10.24 – 12.13</span>
+        <span class="badge badge-brass">水星天蠍順行 ・ 金星天秤順行</span>
+        <span class="badge">木星停滯與逆行</span>
+        <span class="badge badge-coral">火木合相能量高峰</span>
+      </div>
+
+      <div>
+        <h1 class="title">水逆倒數與星象轉折：從高壓翻攪走向<em>局勢重組</em></h1>
+        <p class="deck-brass">CELESTIAL TRANSIT DOSSIER · RETROGRADE, STATIONARY &amp; DIRECT MOTION ANALYSIS</p>
+      </div>
+
+      <p class="lede">
+        本觀測報告統合四份星象分析與雙主星筆記：自 <strong>10/24 水星天蠍座逆行</strong>揭開暗處隱情與溝通考驗，經由 <strong>11/13 前火木合相高峰</strong>的情緒與安全臨界點，於 <strong>11/14 迎來水星、金星同日雙順行</strong>解除誤會與人際卡關；隨後進入 <strong>11 月中至 12/13 的木星停滯與逆行</strong>，引導四大象別星座收斂過度膨脹，以真實實力迎向 12 月土星與海王星順行的新局。
+      </p>
+
+      <div class="telemetry-strip" aria-label="關鍵星象節點摘要">
+        <div class="panel telemetry-tile">
+          <span class="telemetry-date">11/13 前 · 火木合相高峰</span>
+          <span class="telemetry-value">防範衝動與實體安全</span>
+          <span class="telemetry-note">火能量達頂點，留意言語衝突、危機感升高與用火交通意外。</span>
+        </div>
+        <div class="panel telemetry-tile">
+          <span class="telemetry-date">11/14 · 水星與金星雙順行</span>
+          <span class="telemetry-value">誤會消散、貴人回歸</span>
+          <span class="telemetry-note">凌晨水星順行天蠍釐清真相；上午金星順行天秤修復夥伴合作。</span>
+        </div>
+        <div class="panel telemetry-tile">
+          <span class="telemetry-date">11 月中–12 月 · 木星停滯</span>
+          <span class="telemetry-value">虛高消風、低調務實</span>
+          <span class="telemetry-note">過度樂觀期待開始收縮，切忌盲目冒險或被「造神」，回歸真本事。</span>
+        </div>
+        <div class="panel telemetry-tile">
+          <span class="telemetry-date">12/13 之後 · 木逆與土海順行</span>
+          <span class="telemetry-value">社會反思、重建節奏</span>
+          <span class="telemetry-note">木星正式逆行配合 12 月土海順行，補救延宕計畫並檢視健康警訊。</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-grid">
+    <nav class="anchor-index" aria-label="報告章節導覽">
+      <span class="anchor-index-label">INDEX //</span>
+      <a class="anchor-link" href="#sec-states">一、順行／停滯／逆行意涵解析</a>
+      <a class="anchor-link" href="#sec-timeline">二、重大星象時間軸與四象重點</a>
+      <a class="anchor-link" href="#sec-elements">三、四大象別運勢與雙盤查詢</a>
+      <a class="anchor-link" href="#sec-cases">四、太陽獅子×上升射手／太陽處女×上升水瓶</a>
+    </nav>
+
+    <!-- SECTION 1: Planetary States -->
+    <section id="sec-states" class="section-block reveal-item">
+      <div class="section-head">
+        <span class="section-kicker">SECTION 01 · PLANETARY MOTION MECHANICS</span>
+        <h2 class="section-title">行星的「逆行、停滯與順行」究竟意味著什麼？</h2>
+        <p class="section-intro">
+          星象轉折之所以帶來劇烈體感，來自地球與各行星公轉速度差造成的視運動切換。點選下方三種狀態或啟動軌道演示，即可對照其在黃道上的運行軌跡與現實生活中的對應訊號。
+        </p>
+      </div>
+
+      <div class="panel orbital-lab">
+        <div class="orbital-stage">
+          <div class="btn-row" role="group" aria-label="選擇行星運行狀態">
+            <button type="button" class="btn btn-tab-active" id="btn-state-retrograde" onclick="selectMotionState('retrograde')">
+              <i data-lucide="rotate-ccw" width="16" height="16" aria-hidden="true"></i>
+              逆行期 Retrograde
+            </button>
+            <button type="button" class="btn" id="btn-state-stationary" onclick="selectMotionState('stationary')">
+              <i data-lucide="pause-circle" width="16" height="16" aria-hidden="true"></i>
+              停滯期 Stationary
+            </button>
+            <button type="button" class="btn" id="btn-state-direct" onclick="selectMotionState('direct')">
+              <i data-lucide="arrow-up-right" width="16" height="16" aria-hidden="true"></i>
+              順行期 Direct
+            </button>
+            <button type="button" class="btn" id="btn-play-motion" onclick="toggleMotionDemo()">
+              <i data-lucide="play" width="16" height="16" aria-hidden="true"></i>
+              <span>演示視運動切換</span>
+            </button>
+          </div>
+
+          <div class="observation-well orbital-svg-wrap">
+            <svg class="orbital-svg" viewBox="0 0 560 280" role="img" aria-label="行星視運動 S 型轉折軌道圖：呈現順行、停滯駐留與逆行回溯段">
+              <!-- Celestial coordinate grid -->
+              <line class="svg-grid-line" x1="40" y1="60" x2="520" y2="60" />
+              <line class="svg-grid-line" x1="40" y1="140" x2="520" y2="140" />
+              <line class="svg-grid-line" x1="40" y1="220" x2="520" y2="220" />
+              <line class="svg-grid-line" x1="150" y1="30" x2="150" y2="250" />
+              <line class="svg-grid-line" x1="280" y1="30" x2="280" y2="250" />
+              <line class="svg-grid-line" x1="410" y1="30" x2="410" y2="250" />
+
+              <!-- Ecliptic baseline -->
+              <line class="svg-axis-line" x1="40" y1="242" x2="520" y2="242" />
+              <text class="svg-label-mono" x="42" y="260">WEST · ECLIPTIC LONGITUDE</text>
+              <text class="svg-label-mono" x="415" y="260">PROGRADE DIRECTION →</text>
+
+              <!-- Apparent retrograde loop S-curve -->
+              <path class="svg-path-base" d="M 55 205 C 120 198, 175 162, 215 110 C 245 70, 295 62, 340 92 C 378 118, 362 178, 305 182 C 250 185, 222 145, 245 112 C 275 72, 395 66, 505 55" />
+
+              <!-- Active highlighted segment (updated by JS) -->
+              <path id="orbital-active-arc" class="svg-path-active" d="M 340 92 C 378 118, 362 178, 305 182" />
+
+              <!-- Reference station & phase markers -->
+              <circle class="svg-node-muted" cx="120" cy="186" r="5" />
+              <text class="svg-label-mono" x="78" y="216">先前順行</text>
+
+              <circle class="svg-node-stationary" cx="344" cy="96" r="6" />
+              <text class="svg-label-brass" x="355" y="92">停滯轉折點 I</text>
+
+              <circle class="svg-node-retro" cx="298" cy="181" r="6" />
+              <text class="svg-label-sky" x="266" y="203">逆行回溯段</text>
+
+              <circle class="svg-node-stationary" cx="242" cy="116" r="6" />
+              <text class="svg-label-brass" x="158" y="112">停滯轉折點 II</text>
+
+              <circle class="svg-node-direct" cx="465" cy="60" r="6" />
+              <text class="svg-label-sky" x="430" y="45">順行推進段</text>
+
+              <!-- Animated planet indicator -->
+              <g id="planet-cursor" transform="translate(298, 181)">
+                <circle r="13" fill="none" stroke="var(--primary)" stroke-width="1.5" stroke-dasharray="3 3" />
+                <circle r="7" fill="var(--primary)" />
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        <div class="observation-well state-detail-card" id="motion-detail-panel">
+          <div>
+            <div class="state-meta-row">
+              <span class="coord-label" id="motion-code">STATE // RETROGRADE</span>
+              <span class="badge badge-coral" id="motion-badge">向內翻攪與回溯</span>
+            </div>
+            <h3 class="state-title" id="motion-title" style="margin-top: var(--space-sm);">逆行（Retrograde）：秘密曝光與舊案重審</h3>
+          </div>
+          <ul class="kv-list">
+            <li class="kv-item">
+              <div class="kv-term">運行視運動機制</div>
+              <p class="kv-desc" id="motion-mechanism">行星在地球視角下看似沿黃道向後倒退，推進速度受阻、能量朝向內部折返。</p>
+            </li>
+            <li class="kv-item">
+              <div class="kv-term">占星轉折核心意涵</div>
+              <p class="kv-desc" id="motion-meaning">潛伏在深處的不對勁、秘密交易或隱情容易曝光；人們易陷入敏感、玻璃心與猜忌，也是補救延宕計畫與健康警訊的反思期。</p>
+            </li>
+            <li class="kv-item">
+              <div class="kv-term">本波代表星象</div>
+              <p class="kv-desc" id="motion-examples">10/24 水星天蠍逆行（3C／交通／破財與誤會）；12/13 木星正式逆行（社會層面反思與整體能量調整）。</p>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- All 3 states always visible side by side for instant comparison -->
+      <div class="three-states-grid">
+        <article class="panel state-summary-card is-selected" id="card-state-retrograde" onclick="selectMotionState('retrograde')">
+          <div class="state-meta-row">
+            <span class="coord-label">01 · RETROGRADE</span>
+            <span class="badge badge-coral">回溯檢視</span>
+          </div>
+          <h3 class="state-title">逆行：揭露盲點與向內修正</h3>
+          <p class="telemetry-note">資訊落差、情緒敏感與舊問題浮出檯面。水逆期須防 3C 故障與猜疑；木逆期則要求腳踏實地檢視實力與健康舊傷。</p>
+        </article>
+
+        <article class="panel state-summary-card" id="card-state-stationary" onclick="selectMotionState('stationary')">
+          <div class="state-meta-row">
+            <span class="coord-label">02 · STATIONARY</span>
+            <span class="badge badge-brass">能量聚焦</span>
+          </div>
+          <h3 class="state-title">停滯：膨脹消風與收斂定錨</h3>
+          <p class="telemetry-note">行星換向前的駐留急煞，張力最顯著。木星停滯期（11月中–12月）讓虛高期待與過度樂觀收縮，逼迫回歸務實價值。</p>
+        </article>
+
+        <article class="panel state-summary-card" id="card-state-direct" onclick="selectMotionState('direct')">
+          <div class="state-meta-row">
+            <span class="coord-label">03 · DIRECT</span>
+            <span class="badge badge-mint">阻礙解除</span>
+          </div>
+          <h3 class="state-title">順行：誤會釐清與夥伴歸隊</h3>
+          <p class="telemetry-note">恢復順向推進，卡關的溝通與合作關係重新接軌。11/14 水星與金星同日順行，象徵混亂終結、得力助手重新補位。</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- SECTION 2: Timeline & 4 Major Events -->
+    <section id="sec-timeline" class="section-block reveal-item">
+      <div class="section-head">
+        <span class="section-kicker">SECTION 02 · CHRONOLOGY &amp; MAJOR SHIFTS</span>
+        <h2 class="section-title">10/24 至 12 月：從火木高峰跨越 11/14 雙順行門檻</h2>
+        <p class="section-intro">
+          這波轉折具備明確的先高壓後釋放節奏：11/13 前火木合相推升焦慮與衝突風險，11/14 凌晨至上午水金雙星接連順行解鎖僵局，隨後由木星停滯與 12 月星象完成結構性收斂。點選時間軸節點可檢視各期應對建議。
+        </p>
+      </div>
+
+      <div class="timeline-layout">
+        <div class="panel">
+          <div class="chart-legend" aria-label="圖表圖例">
+            <span class="legend-item"><span class="legend-swatch swatch-coral"></span>混亂與衝突張力指數（定性趨勢）</span>
+            <span class="legend-item"><span class="legend-swatch swatch-brass"></span>溝通清晰與務實掌控度（定性趨勢）</span>
+          </div>
+          <div class="observation-well">
+            <svg class="timeline-svg" viewBox="0 0 680 260" role="img" aria-label="10月24日至12月星象轉折張力與清晰度變化時間軸圖表">
+              <!-- Horizontal grid -->
+              <line class="svg-grid-line" x1="45" y1="45" x2="645" y2="45" />
+              <line class="svg-grid-line" x1="45" y1="100" x2="645" y2="100" />
+              <line class="svg-grid-line" x1="45" y1="155" x2="645" y2="155" />
+              <line class="svg-grid-line" x1="45" y1="210" x2="645" y2="210" />
+
+              <!-- Y-axis mono labels -->
+              <text class="svg-label-mono" x="8" y="49">HIGH</text>
+              <text class="svg-label-mono" x="8" y="159">LOW</text>
+
+              <!-- Clarity area & line (Brass) -->
+              <path class="svg-clarity-area" d="M 75 182 L 165 190 L 255 120 L 345 92 L 435 76 L 525 65 L 615 52 L 615 210 L 75 210 Z" />
+              <path class="svg-clarity-line" d="M 75 182 L 165 190 L 255 120 L 345 92 L 435 76 L 525 65 L 615 52" />
+
+              <!-- Tension line (Coral) -->
+              <path class="svg-tension-line" d="M 75 102 L 165 44 L 255 130 L 345 150 L 435 162 L 525 148 L 615 168" />
+
+              <!-- Direct peak annotation -->
+              <line x1="165" y1="44" x2="188" y2="26" stroke="var(--data-4)" stroke-width="1" />
+              <text class="svg-label-mono" x="193" y="28" style="fill: var(--data-4);">11/13前 火木合相頂峰</text>
+
+              <line x1="255" y1="120" x2="274" y2="75" stroke="var(--primary)" stroke-width="1" />
+              <text class="svg-label-brass" x="278" y="76">11/14 水金雙順行反轉</text>
+
+              <!-- 7 interactive epoch nodes -->
+              <g class="timeline-node-btn" id="node-epoch-0" onclick="selectEpoch(0)">
+                <circle class="timeline-node-hit" cx="75" cy="102" r="22" />
+                <circle class="timeline-node-ring" cx="75" cy="102" r="12" />
+                <circle cx="75" cy="102" r="5" fill="var(--data-4)" />
+                <text class="svg-label-mono" x="56" y="232">10/24</text>
+              </g>
+              <g class="timeline-node-btn is-active" id="node-epoch-1" onclick="selectEpoch(1)">
+                <circle class="timeline-node-hit" cx="165" cy="44" r="22" />
+                <circle class="timeline-node-ring" cx="165" cy="44" r="12" />
+                <circle cx="165" cy="44" r="6" fill="var(--data-4)" />
+                <text class="svg-label-mono" x="142" y="232">11/13前</text>
+              </g>
+              <g class="timeline-node-btn" id="node-epoch-2" onclick="selectEpoch(2)">
+                <circle class="timeline-node-hit" cx="255" cy="120" r="22" />
+                <circle class="timeline-node-ring" cx="255" cy="120" r="12" />
+                <circle cx="255" cy="120" r="5" fill="var(--primary)" />
+                <text class="svg-label-mono" x="225" y="232">11/14 00:00</text>
+              </g>
+              <g class="timeline-node-btn" id="node-epoch-3" onclick="selectEpoch(3)">
+                <circle class="timeline-node-hit" cx="345" cy="92" r="22" />
+                <circle class="timeline-node-ring" cx="345" cy="92" r="12" />
+                <circle cx="345" cy="92" r="5" fill="var(--data-3)" />
+                <text class="svg-label-mono" x="318" y="232">11/14 08:00+</text>
+              </g>
+              <g class="timeline-node-btn" id="node-epoch-4" onclick="selectEpoch(4)">
+                <circle class="timeline-node-hit" cx="435" cy="76" r="22" />
+                <circle class="timeline-node-ring" cx="435" cy="76" r="12" />
+                <circle cx="435" cy="76" r="5" fill="var(--primary)" />
+                <text class="svg-label-mono" x="406" y="232">11月中–12月</text>
+              </g>
+              <g class="timeline-node-btn" id="node-epoch-5" onclick="selectEpoch(5)">
+                <circle class="timeline-node-hit" cx="525" cy="65" r="22" />
+                <circle class="timeline-node-ring" cx="525" cy="65" r="12" />
+                <circle cx="525" cy="65" r="5" fill="var(--tertiary)" />
+                <text class="svg-label-mono" x="507" y="232">12/13</text>
+              </g>
+              <g class="timeline-node-btn" id="node-epoch-6" onclick="selectEpoch(6)">
+                <circle class="timeline-node-hit" cx="615" cy="52" r="22" />
+                <circle class="timeline-node-ring" cx="615" cy="52" r="12" />
+                <circle cx="615" cy="52" r="5" fill="var(--data-3)" />
+                <text class="svg-label-mono" x="594" y="232">12月期間</text>
+              </g>
+            </svg>
+          </div>
+
+          <div class="epoch-pill-row" style="margin-top: var(--space-md);" aria-label="快速切換時間節點">
+            <button type="button" class="epoch-chip" id="chip-epoch-0" onclick="selectEpoch(0)">10/24 水逆</button>
+            <button type="button" class="epoch-chip is-active" id="chip-epoch-1" onclick="selectEpoch(1)">11/13前 火木</button>
+            <button type="button" class="epoch-chip" id="chip-epoch-2" onclick="selectEpoch(2)">11/14 水順</button>
+            <button type="button" class="epoch-chip" id="chip-epoch-3" onclick="selectEpoch(3)">11/14 金順</button>
+            <button type="button" class="epoch-chip" id="chip-epoch-4" onclick="selectEpoch(4)">11月中–12月 木停</button>
+            <button type="button" class="epoch-chip" id="chip-epoch-5" onclick="selectEpoch(5)">12/13 木逆</button>
+            <button type="button" class="epoch-chip" id="chip-epoch-6" onclick="selectEpoch(6)">12月 土海順</button>
+          </div>
+        </div>
+
+        <aside class="panel epoch-inspector" aria-live="polite">
+          <div>
+            <div class="state-meta-row">
+              <span class="coord-label" id="epoch-date-label">11/13 前</span>
+              <span class="badge badge-coral" id="epoch-tag">高壓警戒</span>
+            </div>
+            <h3 class="state-title" id="epoch-title" style="margin-top: var(--space-sm);">火木合相高峰期</h3>
+          </div>
+          <ul class="kv-list">
+            <li class="kv-item">
+              <div class="kv-term">關鍵影響與現象</div>
+              <p class="kv-desc" id="epoch-impact">火星與木星合相能量達到頂點，危機感升高與情緒容易失控。</p>
+            </li>
+            <li class="kv-item">
+              <div class="kv-term">應對與行動建議</div>
+              <p class="kv-desc" id="epoch-advice">特別注意用火安全與意外事故，避免衝動引發言語衝突或人際硬碰硬。</p>
+            </li>
+          </ul>
+          <div class="observation-well" style="font-size: 0.875rem; color: var(--on-surface-variant);">
+            註：上方曲線為依據筆記描述繪製之定性張力與穩定度對照，點選任一節點可同步標記下方完整時程表。
+          </div>
+        </aside>
+      </div>
+
+      <!-- Full 7-milestone chronological table -->
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>時間點</th>
+              <th>星象事件</th>
+              <th>關鍵影響與現象</th>
+              <th>應對與建議</th>
+            </tr>
+          </thead>
+          <tbody id="timeline-table-body">
+            <tr id="row-epoch-0" onclick="selectEpoch(0)">
+              <td class="td-mono">10/24</td>
+              <td class="td-title">水星開始逆行</td>
+              <td>水星在天蠍座開始逆行，隱藏秘密或私下交易容易曝光，溝通易產生誤會與猜疑。</td>
+              <td>避免猜忌與玻璃心，注意 3C 設備保養與交通安全。</td>
+            </tr>
+            <tr id="row-epoch-1" class="is-highlighted" onclick="selectEpoch(1)">
+              <td class="td-mono">11/13 前</td>
+              <td class="td-title">火木合相高峰期</td>
+              <td>火星與木星合相能量達到頂點，危機感升高與情緒容易失控。</td>
+              <td>特別注意用火安全與意外事故，避免衝動引發言語衝突。</td>
+            </tr>
+            <tr id="row-epoch-2" onclick="selectEpoch(2)">
+              <td class="td-mono">11/14 凌晨 00:00</td>
+              <td class="td-title">水星轉為順行</td>
+              <td>水星在天蠍座結束逆行，溝通卡關與暗中猜疑逐漸消散。</td>
+              <td>人際誤會水落石出，適合坦誠溝通與釐清真相。</td>
+            </tr>
+            <tr id="row-epoch-3" onclick="selectEpoch(3)">
+              <td class="td-mono">11/14 上午 08:00 多</td>
+              <td class="td-title">金星轉為順行</td>
+              <td>金星在天秤座結束逆行，合作關係與伴侶緊張局勢紓解。</td>
+              <td>得力助手與夥伴回歸，合作效益與人際助力顯著提升。</td>
+            </tr>
+            <tr id="row-epoch-4" onclick="selectEpoch(4)">
+              <td class="td-mono">11 月中～12 月</td>
+              <td class="td-title">木星處於停滯期</td>
+              <td>木星開始停滯，過去過度樂觀或膨脹的事物開始「消風」與收縮。</td>
+              <td>保持低調與務實，切勿盲目冒險或過度張揚。</td>
+            </tr>
+            <tr id="row-epoch-5" onclick="selectEpoch(5)">
+              <td class="td-mono">12/13</td>
+              <td class="td-title">木星正式逆行</td>
+              <td>木星展開逆行，帶來社會層面的反思與整體能量調整。</td>
+              <td>腳踏實地檢視真實實力，補救延宕計畫與健康警訊。</td>
+            </tr>
+            <tr id="row-epoch-6" onclick="selectEpoch(6)">
+              <td class="td-mono">12 月期間</td>
+              <td class="td-title">土星與海王星順行</td>
+              <td>與木星逆行形成重大局勢轉折，整體社會與個人迎來新一輪調整。</td>
+              <td>重建長遠規劃，回歸核心價值與務實節奏。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 4 Major Astrological Shifts Detail -->
+      <div class="events-grid">
+        <article class="panel event-card">
+          <div class="event-card-head">
+            <h3 class="event-card-title">水星順行（天蠍座）：告別糾結與猜忌</h3>
+            <span class="badge">11/14 凌晨 00:00</span>
+          </div>
+          <ul class="clean-list">
+            <li><strong>逆行回顧（10/24 起）：</strong>潛伏深處的不對勁、秘密交易或隱情被調查攤開，易敏感、玻璃心、疑神疑鬼，伴隨 3C 故障、交通延誤與額外破財。</li>
+            <li><strong>順行契機：</strong>資訊落差與溝通誤解逐步化解，隱藏細節水落石出，能以更客觀平常的心態坦誠對話。</li>
+          </ul>
+        </article>
+
+        <article class="panel event-card">
+          <div class="event-card-head">
+            <h3 class="event-card-title">金星順行（天秤座）：修復夥伴與合作</h3>
+            <span class="badge badge-mint">11/14 上午 08:00 多</span>
+          </div>
+          <ul class="clean-list">
+            <li><strong>逆行考驗：</strong>凸顯合作夥伴、婚姻關係與人際相處中的隱性矛盾與拉扯。</li>
+            <li><strong>順行契機：</strong>關係邁入新階段，原先暫時缺席或卡關的得力助手與貴人夥伴重新回歸補位，合作效益顯著提升。</li>
+          </ul>
+        </article>
+
+        <article class="panel event-card">
+          <div class="event-card-head">
+            <h3 class="event-card-title">木星停滯與逆行：虛高收縮與實力檢驗</h3>
+            <span class="badge badge-brass">11 月中～12/13 逆行</span>
+          </div>
+          <ul class="clean-list">
+            <li><strong>停滯訊號：</strong>木星象徵擴張與樂觀，停滯期讓過度膨脹的期待、誇大行情或虛高氣勢開始「消風」收縮。</li>
+            <li><strong>務實應對：</strong>切勿盲目冒險或被「造神」，主動收斂張揚態度；12/13 正式逆行後搭配 12 月土海順行，腳踏實地補救舊計畫並留意健康警訊。</li>
+          </ul>
+        </article>
+
+        <article class="panel event-card">
+          <div class="event-card-head">
+            <h3 class="event-card-title">火木合相高峰期：火能量爆發警戒</h3>
+            <span class="badge badge-coral">11/13 前關鍵期</span>
+          </div>
+          <ul class="clean-list">
+            <li><strong>情緒失控風險：</strong>水星順行前幾天火星與木星合相能量達頂峰，易出現焦躁、危機感升高或遭遇言語攻擊。</li>
+            <li><strong>實體安全防範：</strong>務必沉住氣避免硬碰硬，生活上嚴加留意用火安全、火災、爆發性意外與交通安全。</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <!-- SECTION 3: Four Elements & Interactive Sun x Rising Synthesizer -->
+    <section id="sec-elements" class="section-block reveal-item">
+      <div class="section-head">
+        <span class="section-kicker">SECTION 03 · FOUR ELEMENTS &amp; DUAL-CHART MATRIX</span>
+        <h2 class="section-title">四大象別星座運勢全覽與雙重配置合成器</h2>
+        <p class="section-intro">
+          太陽代表個人核心主體與專注領域，上升代表外在環境與應對步調。下方先提供四大象別的完整對照矩陣，您也可使用合成器選擇自己的太陽與上升星座，快速對照雙重星象的交疊策略。
+        </p>
+      </div>
+
+      <!-- Element filter controls -->
+      <div class="btn-row" role="group" aria-label="篩選象別星座">
+        <span class="coord-label" style="margin-right: var(--space-xs);">FILTER //</span>
+        <button type="button" class="btn btn-tab-active" id="filter-all" onclick="filterElement('all')">全部四大象別</button>
+        <button type="button" class="btn" id="filter-fire" onclick="filterElement('fire')">火象（牡羊・獅子・射手）</button>
+        <button type="button" class="btn" id="filter-earth" onclick="filterElement('earth')">土象（金牛・處女・摩羯）</button>
+        <button type="button" class="btn" id="filter-air" onclick="filterElement('air')">風象（雙子・天秤・水瓶）</button>
+        <button type="button" class="btn" id="filter-water" onclick="filterElement('water')">水象（巨蟹・天蠍・雙魚）</button>
+      </div>
+
+      <!-- Full 4-element comparison table -->
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>星象類別</th>
+              <th>水星順行影響（11/14）</th>
+              <th>金星順行影響（11/14）</th>
+              <th>木星停滯注意事項（12/13 前）</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr id="el-row-fire">
+              <td class="td-title">火象星座<br><span class="coord-label-cjk">牡羊・獅子・射手</span></td>
+              <td>暗中小人與疑慮消除，談判與內部問題獲得明確答案。</td>
+              <td>貴人與合作夥伴回歸，人際助力大增。</td>
+              <td>收斂過度高調與膨脹，低調務實展現真才實學。</td>
+            </tr>
+            <tr id="el-row-earth">
+              <td class="td-title">土象星座<br><span class="coord-label-cjk">金牛・處女・摩羯</span></td>
+              <td>人際誤會解開，分清敵我，溝通恢復流暢。</td>
+              <td>職場卡關與實質進度阻礙解除，財務運勢提升。</td>
+              <td>暗中煩惱與焦慮收縮，把握時間休息與調整。</td>
+            </tr>
+            <tr id="el-row-air">
+              <td class="td-title">風象星座<br><span class="coord-label-cjk">雙子・天秤・水瓶</span></td>
+              <td>混亂行程與過勞改善，掌握生活與工作的主導權。</td>
+              <td>個人魅力與價值大增，獲讚賞與良好桃花。</td>
+              <td>繁雜無效的社交應酬減少，回歸精準人際圈。</td>
+            </tr>
+            <tr id="el-row-water">
+              <td class="td-title">水象星座<br><span class="coord-label-cjk">巨蟹・天蠍・雙魚</span></td>
+              <td>擺脫敏感與玻璃心，表達自我更具自信與說服力。</td>
+              <td>隱性不安消失，合作與感情關卡順利突破。</td>
+              <td>留意健康與職場細節，補救延宕事項，切勿過度自信。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 4 Elemental Deep Cards -->
+      <div class="element-grid">
+        <article class="panel element-card" id="el-card-fire">
+          <div class="state-meta-row">
+            <span class="coord-label">ELEMENT 01 // FIRE SIGNS</span>
+            <span class="badge badge-coral">牡羊 ・ 獅子 ・ 射手</span>
+          </div>
+          <h3 class="state-title">火象星座：收斂高調，憑實力展現價值</h3>
+          <p class="telemetry-note"><strong>順行轉折：</strong>水星與金星相繼順行後，卡在暗處的小人疑雲或內部混亂（如家事、財務談判）獲明確解決，得力助手與合夥人重新補位。</p>
+          <p class="telemetry-note"><strong>木星停滯提醒：</strong>若過去態度過於高調或樂觀誇大，此時容易面臨收縮或被檢討的落差感；建議主動低調，回歸真實能力驗證。</p>
+        </article>
+
+        <article class="panel element-card" id="el-card-earth">
+          <div class="state-meta-row">
+            <span class="coord-label">ELEMENT 02 // EARTH SIGNS</span>
+            <span class="badge badge-brass">金牛 ・ 處女 ・ 摩羯</span>
+          </div>
+          <h3 class="state-title">土象星座：職場解套，財務與生活重拾效率</h3>
+          <p class="telemetry-note"><strong>順行轉折：</strong>職場耗能、進度卡關及人際猜疑大幅改善，彼此能更直接明朗地溝通；金星順行同步帶動工作效率與財務運勢好轉。</p>
+          <p class="telemetry-note"><strong>木星停滯提醒：</strong>暗中累積的煩惱正在收縮，可化變動或危機為轉機，善用時間適度休息並修復身心。</p>
+        </article>
+
+        <article class="panel element-card" id="el-card-air">
+          <div class="state-meta-row">
+            <span class="coord-label">ELEMENT 03 // AIR SIGNS</span>
+            <span class="badge">雙子 ・ 天秤 ・ 水瓶</span>
+          </div>
+          <h3 class="state-title">風象星座：精簡社交，重掌生活與事業步調</h3>
+          <p class="telemetry-note"><strong>順行轉折：</strong>擺脫極度忙亂、救火式的混亂步調，重獲工作與生活自主權；金星順行讓個人魅力與美感大幅展現，容易收穫讚賞。</p>
+          <p class="telemetry-note"><strong>木星停滯提醒：</strong>繁雜無效的社交應酬開始減少，留下來的都是精準且有價值的關係，人際與合作回歸務實。</p>
+        </article>
+
+        <article class="panel element-card" id="el-card-water">
+          <div class="state-meta-row">
+            <span class="coord-label">ELEMENT 04 // WATER SIGNS</span>
+            <span class="badge badge-mint">巨蟹 ・ 天蠍 ・ 雙魚</span>
+          </div>
+          <h3 class="state-title">水象星座：擺脫敏感，補救健康與工作舊疾</h3>
+          <p class="telemetry-note"><strong>順行轉折：</strong>水逆帶來的玻璃心與溝通焦慮消散，能清晰傳達理念並獲公正評價；隱性不安解除，感情與合作關卡順利突破。</p>
+          <p class="telemetry-note"><strong>木星停滯提醒：</strong>職場與健康切忌過度自信或過勞；務必落實舊有延宕計畫，並正視牙齒、舊傷等身體警訊。</p>
+        </article>
+      </div>
+
+      <!-- Interactive Sun x Rising Synthesizer -->
+      <div class="synthesizer-panel">
+        <div class="state-meta-row">
+          <div>
+            <span class="coord-label">DUAL-CHART SYNTHESIZER // 互動配置對照儀</span>
+            <h3 class="state-title" style="margin-top: var(--space-xs);">太陽星座 × 上升星座：組合交疊影響速查</h3>
+          </div>
+          <div class="btn-row">
+            <button type="button" class="btn" onclick="applyPreset('leo', 'sagittarius')">載入筆記個案：太陽獅子 × 上升射手</button>
+            <button type="button" class="btn" onclick="applyPreset('virgo', 'aquarius')">載入筆記個案：太陽處女 × 上升水瓶</button>
+          </div>
+        </div>
+
+        <div class="synth-controls">
+          <div class="field-group">
+            <label class="field-label" for="sun-select">太陽星座（個人核心主體與實務焦點）</label>
+            <select class="select-input" id="sun-select" onchange="updateDualChart()">
+              <option value="aries">牡羊座（火象）</option>
+              <option value="taurus">金牛座（土象）</option>
+              <option value="gemini">雙子座（風象）</option>
+              <option value="cancer">巨蟹座（水象）</option>
+              <option value="leo" selected>獅子座（火象）</option>
+              <option value="virgo">處女座（土象）</option>
+              <option value="libra">天秤座（風象）</option>
+              <option value="scorpio">天蠍座（水象）</option>
+              <option value="sagittarius">射手座（火象）</option>
+              <option value="capricorn">摩羯座（土象）</option>
+              <option value="aquarius">水瓶座（風象）</option>
+              <option value="pisces">雙魚座（水象）</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="rising-select">上升星座（外在環境與生活步調）</label>
+            <select class="select-input" id="rising-select" onchange="updateDualChart()">
+              <option value="aries">牡羊座（火象）</option>
+              <option value="taurus">金牛座（土象）</option>
+              <option value="gemini">雙子座（風象）</option>
+              <option value="cancer">巨蟹座（水象）</option>
+              <option value="leo">獅子座（火象）</option>
+              <option value="virgo">處女座（土象）</option>
+              <option value="libra">天秤座（風象）</option>
+              <option value="scorpio">天蠍座（水象）</option>
+              <option value="sagittarius" selected>射手座（火象）</option>
+              <option value="capricorn">摩羯座（土象）</option>
+              <option value="aquarius">水瓶座（風象）</option>
+              <option value="pisces">雙魚座（水象）</option>
+            </select>
+          </div>
+
+          <button type="button" class="btn btn-primary" onclick="updateDualChart()">更新對照解析</button>
+        </div>
+
+        <div class="synth-output" id="synth-output" aria-live="polite">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: Two Complete Case Dossiers -->
+    <section id="sec-cases" class="section-block reveal-item">
+      <div class="section-head">
+        <span class="section-kicker">SECTION 04 · DETAILED DUAL-SIGN DOSSIERS</span>
+        <h2 class="section-title">筆記深度個案：太陽獅子×上升射手 ＆ 太陽處女×上升水瓶</h2>
+        <p class="section-intro">
+          以下完整彙整來源筆記中的兩組雙星座實戰解析，包含宮位專屬落點、共通星象轉折與「一頁速讀」核心行動指南。
+        </p>
+      </div>
+
+      <div class="cases-grid">
+        <!-- Case A: Sun Leo + Rising Sagittarius -->
+        <article class="panel case-dossier">
+          <div class="state-meta-row">
+            <span class="coord-label">DOSSIER A // DUAL FIRE RESONANCE</span>
+            <span class="badge badge-coral">雙重火象能量</span>
+          </div>
+          <h3 class="section-title" style="font-size: var(--subhead-size);">太陽獅子 × 上升射手：星象轉折整體解析</h3>
+          <p class="telemetry-note">同時受到太陽（核心意識）與上升（外在氣場與領域）的雙重火象影響：11/14 迎來暗處疑雲解除與貴人補位，12/13 前須主動收斂高調與過度樂觀。</p>
+
+          <div class="case-subblock">
+            <h4 class="case-subhead">太陽獅子座（核心自我與內部領域）</h4>
+            <ul class="clean-list">
+              <li><strong>水星順行在四宮：</strong>家庭紛亂、家人關係或公司內部成員的溝通困局逐漸明朗，適合講開心里話，或重新檢視房地產與家庭計畫。</li>
+              <li><strong>金星順行在三宮／風象宮位：</strong>朋友與兄弟姊妹間表達障礙消失，原本被牽制的行程或學習計畫恢復主導權，相處輕鬆愉快。</li>
+              <li><strong>木星停滯在一宮／命宮：</strong>提醒「主動收斂」；若有過度自信或高調情況，宜主動低調避免落差感或被挑剔，腳踏實地展現真才實學。</li>
+            </ul>
+          </div>
+
+          <div class="case-subblock">
+            <h4 class="case-subhead">上升射手座（外在環境與公眾應對）</h4>
+            <ul class="clean-list">
+              <li><strong>水星順行在十二宮：</strong>水逆期易遇背後議論或暗中誤解；順行後真相水落石出，順利解開秘密或搞定暗中小人障礙。</li>
+              <li><strong>金星順行在十一宮／風象宮位：</strong>社交圈、朋友圈或網路粉絲的人際卡關順利化解，重新獲得群眾或市場的肯定與助力。</li>
+              <li><strong>木星停滯在九宮：</strong>拿掉過度樂觀的濾鏡，重新檢視先前想得過於高遠的理想、出國旅行或拓展計畫，以務實步調落實規劃。</li>
+            </ul>
+          </div>
+
+          <div class="quick-read-box">
+            <h4 class="quick-read-title">一頁速讀 // 太陽獅子 + 上升射手 核心行動指南</h4>
+            <ol class="clean-list">
+              <li><strong>11/13 前防範火能量：</strong>控制急躁情緒，避免與人硬碰硬，注意實體用火與交通安全。</li>
+              <li><strong>11/14 後迎接雙順行：</strong>內部家務（獅子）與暗中小人（射手）告一段落，朋友圈與合作貴人全面回歸。</li>
+              <li><strong>木星停滯期主動低調：</strong>切忌過度張揚或盲目擴張，適度收斂氣勢，憑真實實力面對職場與生活。</li>
+            </ol>
+          </div>
+        </article>
+
+        <!-- Case B: Sun Virgo + Rising Aquarius -->
+        <article class="panel case-dossier">
+          <div class="state-meta-row">
+            <span class="coord-label">DOSSIER B // EARTH &amp; AIR SYNERGY</span>
+            <span class="badge">土風雙重能量</span>
+          </div>
+          <h3 class="section-title" style="font-size: var(--subhead-size);">太陽處女 × 上升水瓶：星象轉折整體解析</h3>
+          <p class="telemetry-note">結合太陽土象（職場實務與財務）與上升風象（生活步調與公眾合作）：11/14 擺脫混亂救火狀態並提升魅力財運，12/13 前同步收縮無效社交與暗中焦慮。</p>
+
+          <div class="case-subblock">
+            <h4 class="case-subhead">太陽處女座（核心實務與個人價值）</h4>
+            <ul class="clean-list">
+              <li><strong>水星順行（職場溝通恢復）：</strong>職場耗能、進度拖延與彼此猜疑大幅改善，與同事、同輩間表達障礙化解，溝通更加直接明朗。</li>
+              <li><strong>金星順行在二宮：</strong>職場實質阻礙解除後，個人價值與專業能力獲鼓舞彰顯，金錢與財務運勢轉好，手邊資源運作更順利。</li>
+              <li><strong>木星停滯在十二宮：</strong>隱性的煩惱與不安消退；若遇到計畫突遭取消或變動，不妨轉念當作適度放假與身心修復的契機。</li>
+            </ul>
+          </div>
+
+          <div class="case-subblock">
+            <h4 class="case-subhead">上升水瓶座（外在步調與名聲合作）</h4>
+            <ul class="clean-list">
+              <li><strong>水星順行在十宮：</strong>結束極度忙亂、行程大亂的救火狀態，重掌生活主導權；名聲、事業地位與上司溝通能打開心扉說亮話並獲公正評價。</li>
+              <li><strong>金星順行在九宮：</strong>個人美感與魅力顯現，易獲外界讚賞；跨界合作、海外事務、學習考證或遠途桃花將變得非常順利。</li>
+              <li><strong>木星停滯在七宮：</strong>繁雜無效的社交應酬顯著減少，回歸精準實質；婚姻或事業合作關係空間開始收縮並重新檢視條件，回歸務實合作。</li>
+            </ul>
+          </div>
+
+          <div class="quick-read-box">
+            <h4 class="quick-read-title">一頁速讀 // 太陽處女 + 上升水瓶 核心行動指南</h4>
+            <ol class="clean-list">
+              <li><strong>11/13 前注意情緒與安全：</strong>平復焦躁情緒，避開衝動言語與硬碰硬，注意日常用火與交通安全。</li>
+              <li><strong>11/14 雙順行重掌主導：</strong>職場耗能與救火亂象告一段落，溝通解套，財務好轉且魅力與專業備受肯定。</li>
+              <li><strong>木星停滯期精簡社交：</strong>無效應酬與暗中焦慮同步收縮，將心力聚焦於精準人際與務實合作，並留時間休養生息。</li>
+            </ol>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="colophon">
+    <span class="colophon-label">SOURCES &amp; EDITORIAL NOTE</span>
+    <p style="margin: 0;">資料來源彙整自使用者保存之四份星象筆記：《水逆倒數與星象轉折解析：整體大綱與運勢分析》、《星象轉折時間軸》、《太陽獅子與上升射手：星象轉折整體影響解析》及《太陽處女與上升水瓶-星象運勢解析》。所有星座推論、宮位解析與時間節點皆依上述筆記內容整理呈現。</p>
+  </footer>
+
+  <script>
+    const MOTION_STATES = {
+      retrograde: {
+        code: `STATE // RETROGRADE`,
+        badge: `向內翻攪與回溯`,
+        badgeClass: `badge badge-coral`,
+        title: `逆行（Retrograde）：秘密曝光與舊案重審`,
+        mechanism: `行星在地球視角下看似沿黃道向後倒退，推進速度受阻、能量朝向內部折返。`,
+        meaning: `潛伏在深處的不對勁、秘密交易或隱情容易曝光；人們易陷入敏感、玻璃心與猜忌，也是補救延宕計畫與健康警訊的反思期。`,
+        examples: `10/24 水星天蠍逆行（3C／交通／破財與誤會）；12/13 木星正式逆行（社會層面反思與整體能量調整）。`,
+        arc: `M 344 96 C 378 118, 362 178, 298 181 C 250 183, 226 146, 242 116`,
+        cursorX: 298,
+        cursorY: 181
+      },
+      stationary: {
+        code: `STATE // STATIONARY`,
+        badge: `能量聚焦急煞`,
+        badgeClass: `badge badge-brass`,
+        title: `停滯（Stationary）：虛高消風與務實定錨`,
+        mechanism: `行星由逆轉順或由順轉逆的換向駐留時刻，視運動速度趨近於零，當下行星象徵張力最顯著。`,
+        meaning: `過去過度樂觀的期待、虛高行情與膨脹態度開始「消風」收縮。提醒切勿盲目冒險或被造神，應主動低調、拿掉濾鏡並精簡無效消耗。`,
+        examples: `11 月中～12 月木星停滯期（12/13 正式逆行前）：火象收斂高調、土象收縮煩惱、風象減少應酬、水象注意健康細節。`,
+        arc: `M 215 110 C 245 70, 295 62, 344 96`,
+        cursorX: 344,
+        cursorY: 96
+      },
+      direct: {
+        code: `STATE // DIRECT`,
+        badge: `阻礙解除推進`,
+        badgeClass: `badge badge-mint`,
+        title: `順行（Direct）：真相明朗與夥伴補位`,
+        mechanism: `行星結束換向駐留，恢復沿黃道順向推進，外在溝通與協作重新接軌。`,
+        meaning: `資訊落差、人際猜疑與救火混亂逐步平息；隱藏細節水落石出，原本暫時缺席或卡關的得力助手與合作貴人重新歸隊。`,
+        examples: `11/14 凌晨 00:00 水星天蠍順行；11/14 上午 08:00 多金星天秤順行；12 月期間土星與海王星順行。`,
+        arc: `M 242 116 C 275 72, 395 66, 505 55`,
+        cursorX: 465,
+        cursorY: 60
+      }
+    };
+
+    const EPOCHS = [
+      {
+        date: `10/24`,
+        tag: `水逆揭幕`,
+        tagClass: `badge badge-coral`,
+        title: `水星天蠍座逆行開始`,
+        impact: `隱藏秘密或私下交易容易曝光，溝通易產生誤會、玻璃心與猜疑，伴隨 3C 故障與破財風險。`,
+        advice: `避免猜忌與過度敏感，預留交通緩衝時間並加強 3C 設備備份與保養。`
+      },
+      {
+        date: `11/13 前`,
+        tag: `高壓警戒`,
+        tagClass: `badge badge-coral`,
+        title: `火木合相高峰期`,
+        impact: `火星與木星合相能量達到頂點，危機感升高，情緒容易焦躁失控或遭遇言語攻擊。`,
+        advice: `特別注意用火安全、火災與意外事故，沉住氣避免衝動引發言語衝突或硬碰硬。`
+      },
+      {
+        date: `11/14 凌晨 00:00`,
+        tag: `溝通解套`,
+        tagClass: `badge badge-mint`,
+        title: `水星轉為順行（天蠍座）`,
+        impact: `水逆期間累積的溝通卡關、資訊落差與暗中猜疑逐漸消散，隱藏細節水落石出。`,
+        advice: `人際誤會漸開，適合以客觀平常心坦誠溝通、講開心里話並釐清真相。`
+      },
+      {
+        date: `11/14 上午 08:00 多`,
+        tag: `貴人歸隊`,
+        tagClass: `badge badge-mint`,
+        title: `金星轉為順行（天秤座）`,
+        impact: `合作關係與伴侶間的緊張局勢紓解，過去暫時離隊或卡關的得力助手與夥伴回歸。`,
+        advice: `把握人際助力與合作效益回升的契機，重新對齊合作條件與實質推進進度。`
+      },
+      {
+        date: `11 月中～12 月`,
+        tag: `收斂定錨`,
+        tagClass: `badge badge-brass`,
+        title: `木星處於停滯期`,
+        impact: `木星準備逆行前的停滯期，過去過度樂觀、膨脹的期待或虛高氣勢開始「消風」與收縮。`,
+        advice: `保持低調務實，切勿盲目冒險、過度張揚或被「造神」，憑真實能力說話。`
+      },
+      {
+        date: `12/13`,
+        tag: `結構反思`,
+        tagClass: `badge`,
+        title: `木星正式逆行`,
+        impact: `木星展開逆行，帶來社會層面的反思與整體能量調整，檢驗虛實落差。`,
+        advice: `腳踏實地檢視真實實力，積極補救舊有延宕計畫並正視身體健康警訊。`
+      },
+      {
+        date: `12 月期間`,
+        tag: `新局定調`,
+        tagClass: `badge badge-mint`,
+        title: `土星與海王星順行`,
+        impact: `與木星逆行交會形成重大局勢轉折，整體社會與個人迎來新一輪長線調整。`,
+        advice: `重建長遠規劃，去除不切實際的濾鏡，回歸核心價值與務實節奏。`
+      }
+    ];
+
+    const SIGN_INFO = {
+      aries: { name: `牡羊座`, element: `fire`, elName: `火象` },
+      taurus: { name: `金牛座`, element: `earth`, elName: `土象` },
+      gemini: { name: `雙子座`, element: `air`, elName: `風象` },
+      cancer: { name: `巨蟹座`, element: `water`, elName: `水象` },
+      leo: { name: `獅子座`, element: `fire`, elName: `火象` },
+      virgo: { name: `處女座`, element: `earth`, elName: `土象` },
+      libra: { name: `天秤座`, element: `air`, elName: `風象` },
+      scorpio: { name: `天蠍座`, element: `water`, elName: `水象` },
+      sagittarius: { name: `射手座`, element: `fire`, elName: `火象` },
+      capricorn: { name: `摩羯座`, element: `earth`, elName: `土象` },
+      aquarius: { name: `水瓶座`, element: `air`, elName: `風象` },
+      pisces: { name: `雙魚座`, element: `water`, elName: `水象` }
+    };
+
+    const ELEMENT_DATA = {
+      fire: {
+        mercury: `暗中小人與疑慮消除，談判與內部問題獲得明確答案。`,
+        venus: `貴人與合作夥伴回歸補位，人際與團隊助力大增。`,
+        jupiter: `主動收斂過度高調與膨脹，避開落差感，憑真才實學說話。`
+      },
+      earth: {
+        mercury: `人際誤會解開並分清敵我，職場耗能與溝通恢復明朗流暢。`,
+        venus: `職場實質進度阻礙解除，個人專業價值獲肯定、財務運勢提升。`,
+        jupiter: `暗中煩惱與焦慮開始收縮，若遇變動宜轉念把握時間休息調整。`
+      },
+      air: {
+        mercury: `結束忙亂救火與過勞狀態，重掌生活與工作步調主導權。`,
+        venus: `個人魅力與美感大幅展現，易獲外界讚賞與良好桃花機緣。`,
+        jupiter: `繁雜無效的社交應酬減少，留下精準關係，合作回歸務實。`
+      },
+      water: {
+        mercury: `擺脫水逆帶來的敏感玻璃心，自我表達更具自信與說服力。`,
+        venus: `隱性不安與猜忌消失，感情與合作上的溝通關卡順利突破。`,
+        jupiter: `切忌過度自信或過勞，落實延宕舊計畫並正視牙齒、舊傷等健康警訊。`
+      }
+    };
+
+    let motionTimer = null;
+    const stateOrder = [`retrograde`, `stationary`, `direct`];
+    let currentStateIdx = 0;
+
+    function selectMotionState(stateKey) {
+      const data = MOTION_STATES[stateKey];
+      if (!data) return;
+
+      const idx = stateOrder.indexOf(stateKey);
+      if (idx !== -1) currentStateIdx = idx;
+
+      const arc = document.getElementById(`orbital-active-arc`);
+      const cursor = document.getElementById(`planet-cursor`);
+      if (arc) arc.setAttribute(`d`, data.arc);
+      if (cursor) cursor.setAttribute(`transform`, `translate(${data.cursorX}, ${data.cursorY})`);
+
+      const codeEl = document.getElementById(`motion-code`);
+      const badgeEl = document.getElementById(`motion-badge`);
+      const titleEl = document.getElementById(`motion-title`);
+      const mechEl = document.getElementById(`motion-mechanism`);
+      const meanEl = document.getElementById(`motion-meaning`);
+      const exEl = document.getElementById(`motion-examples`);
+
+      if (codeEl) codeEl.textContent = data.code;
+      if (badgeEl) {
+        badgeEl.textContent = data.badge;
+        badgeEl.className = data.badgeClass;
+      }
+      if (titleEl) titleEl.textContent = data.title;
+      if (mechEl) mechEl.textContent = data.mechanism;
+      if (meanEl) meanEl.textContent = data.meaning;
+      if (exEl) exEl.textContent = data.examples;
+
+      stateOrder.forEach(function(k) {
+        const btn = document.getElementById(`btn-state-${k}`);
+        const card = document.getElementById(`card-state-${k}`);
+        if (btn) {
+          btn.classList.toggle(`btn-tab-active`, k === stateKey);
+        }
+        if (card) {
+          card.classList.toggle(`is-selected`, k === stateKey);
+        }
+      });
+    }
+
+    function toggleMotionDemo() {
+      const btn = document.getElementById(`btn-play-motion`);
+      if (motionTimer) {
+        clearInterval(motionTimer);
+        motionTimer = null;
+        if (btn) {
+          const span = btn.querySelector(`span`);
+          if (span) span.textContent = `演示視運動切換`;
+        }
+        return;
+      }
+
+      if (btn) {
+        const span = btn.querySelector(`span`);
+        if (span) span.textContent = `停止演示`;
+      }
+
+      currentStateIdx = (currentStateIdx + 1) % stateOrder.length;
+      selectMotionState(stateOrder[currentStateIdx]);
+
+      motionTimer = setInterval(function() {
+        currentStateIdx = (currentStateIdx + 1) % stateOrder.length;
+        selectMotionState(stateOrder[currentStateIdx]);
+      }, 1800);
+    }
+
+    function selectEpoch(index) {
+      const item = EPOCHS[index];
+      if (!item) return;
+
+      const dateEl = document.getElementById(`epoch-date-label`);
+      const tagEl = document.getElementById(`epoch-tag`);
+      const titleEl = document.getElementById(`epoch-title`);
+      const impactEl = document.getElementById(`epoch-impact`);
+      const adviceEl = document.getElementById(`epoch-advice`);
+
+      if (dateEl) dateEl.textContent = item.date;
+      if (tagEl) {
+        tagEl.textContent = item.tag;
+        tagEl.className = item.tagClass;
+      }
+      if (titleEl) titleEl.textContent = item.title;
+      if (impactEl) impactEl.textContent = item.impact;
+      if (adviceEl) adviceEl.textContent = item.advice;
+
+      for (let i = 0; i < EPOCHS.length; i++) {
+        const node = document.getElementById(`node-epoch-${i}`);
+        const chip = document.getElementById(`chip-epoch-${i}`);
+        const row = document.getElementById(`row-epoch-${i}`);
+        if (node) node.classList.toggle(`is-active`, i === index);
+        if (chip) chip.classList.toggle(`is-active`, i === index);
+        if (row) row.classList.toggle(`is-highlighted`, i === index);
+      }
+    }
+
+    function filterElement(elKey) {
+      const keys = [`all`, `fire`, `earth`, `air`, `water`];
+      keys.forEach(function(k) {
+        const btn = document.getElementById(`filter-${k}`);
+        if (btn) btn.classList.toggle(`btn-tab-active`, k === elKey);
+      });
+
+      const elKeys = [`fire`, `earth`, `air`, `water`];
+      elKeys.forEach(function(k) {
+        const row = document.getElementById(`el-row-${k}`);
+        const card = document.getElementById(`el-card-${k}`);
+        const isMatch = elKey === `all` || k === elKey;
+        if (row) {
+          row.classList.toggle(`is-highlighted`, elKey !== `all` && k === elKey);
+          row.classList.toggle(`is-dimmed`, !isMatch);
+        }
+        if (card) {
+          card.classList.toggle(`is-focused`, elKey !== `all` && k === elKey);
+          card.classList.toggle(`is-dimmed`, !isMatch);
+        }
+      });
+    }
+
+    function applyPreset(sunKey, risingKey) {
+      const sunSel = document.getElementById(`sun-select`);
+      const risingSel = document.getElementById(`rising-select`);
+      if (sunSel) sunSel.value = sunKey;
+      if (risingSel) risingSel.value = risingKey;
+      updateDualChart();
+    }
+
+    function updateDualChart() {
+      const sunSel = document.getElementById(`sun-select`);
+      const risingSel = document.getElementById(`rising-select`);
+      const output = document.getElementById(`synth-output`);
+      if (!sunSel || !risingSel || !output) return;
+
+      const sunKey = sunSel.value;
+      const risingKey = risingSel.value;
+      const sun = SIGN_INFO[sunKey];
+      const rising = SIGN_INFO[risingKey];
+      if (!sun || !rising) return;
+
+      const sunData = ELEMENT_DATA[sun.element];
+      const risingData = ELEMENT_DATA[rising.element];
+
+      const isDualSame = sun.element === rising.element;
+      const synergyLabel = isDualSame
+        ? `雙重${sun.elName}能量疊加（內外課題共振放大）`
+        : `${sun.elName}核心實務 × ${rising.elName}外在步調`;
+
+      let houseNoteHtml = ``;
+      if (sunKey === `leo` && risingKey === `sagittarius`) {
+        houseNoteHtml = `
+          <div class="synth-box synth-full">
+            <div class="kv-term" style="color: var(--primary);">筆記收錄專屬宮位解析：太陽獅子 × 上升射手</div>
+            <p class="kv-desc" style="color: var(--on-primary-container);">
+              <strong>太陽獅子：</strong>水星順行四宮（家庭與公司內部心結說開）、金星順行三宮（朋友同輩溝通恢復主導）、木星停滯一宮命宮（主動收斂高調）。<br>
+              <strong>上升射手：</strong>水星順行十二宮（擺脫暗中小人陰影）、金星順行十一宮（社交圈與市場助力回歸）、木星停滯九宮（理想與海外計畫回歸務實）。
+            </p>
+          </div>
+        `;
+      } else if (sunKey === `virgo` && risingKey === `aquarius`) {
+        houseNoteHtml = `
+          <div class="synth-box synth-full">
+            <div class="kv-term" style="color: var(--primary);">筆記收錄專屬宮位解析：太陽處女 × 上升水瓶</div>
+            <p class="kv-desc" style="color: var(--on-primary-container);">
+              <strong>太陽處女：</strong>水星順行改善職場耗能與猜疑、金星順行二宮（財務與專業價值獲肯定）、木星停滯十二宮（暗中煩惱收縮，化變動為休息）。<br>
+              <strong>上升水瓶：</strong>水星順行十宮（擺脫救火亂象、名聲與上司溝通順暢）、金星順行九宮（魅力大增與跨界海外順暢）、木星停滯七宮（精簡無效應酬、合作回歸務實）。
+            </p>
+          </div>
+        `;
+      }
+
+      output.innerHTML = `
+        <div class="synth-box">
+          <div class="kv-term">太陽 ${sun.name}（${sun.elName}）· 個人核心領域</div>
+          <p class="kv-desc"><strong>11/14 水星順行：</strong>${sunData.mercury}</p>
+          <p class="kv-desc"><strong>11/14 金星順行：</strong>${sunData.venus}</p>
+          <p class="kv-desc"><strong>12/13 前木星停滯：</strong>${sunData.jupiter}</p>
+        </div>
+        <div class="synth-box">
+          <div class="kv-term">上升 ${rising.name}（${rising.elName}）· 外在環境領域</div>
+          <p class="kv-desc"><strong>11/14 水星順行：</strong>${risingData.mercury}</p>
+          <p class="kv-desc"><strong>11/14 金星順行：</strong>${risingData.venus}</p>
+          <p class="kv-desc"><strong>12/13 前木星停滯：</strong>${risingData.jupiter}</p>
+        </div>
+        <div class="synth-box" style="grid-column: 1 / -1;">
+          <div class="kv-term">組合綜合策略 // ${synergyLabel}</div>
+          <p class="kv-desc">
+            <strong>11/13 前火木合相共同守則：</strong>留意情緒焦躁與言語衝動，嚴防用火與交通安全，避免與人硬碰硬。<br>
+            <strong>雙順行後推進重點：</strong>內在優先處理${sun.elName}課題（${sunData.mercury}），外在積極承接${rising.elName}環境紅利（${risingData.venus}），並於木星停滯期徹底落實「${risingData.jupiter}」的收斂原則。
+          </p>
+        </div>
+        ${houseNoteHtml}
+      `;
+    }
+
+    document.addEventListener(`DOMContentLoaded`, function() {
+      if (typeof lucide !== `undefined` && lucide.createIcons) {
+        lucide.createIcons();
+      }
+
+      selectMotionState(`retrograde`);
+      selectEpoch(1);
+      updateDualChart();
+
+      const revealEls = document.querySelectorAll(`.reveal-item`);
+      if (`IntersectionObserver` in window) {
+        const observer = new IntersectionObserver(function(entries, obs) {
+          entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add(`is-visible`);
+              obs.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.08 });
+
+        revealEls.forEach(function(el) {
+          observer.observe(el);
+        });
+      } else {
+        revealEls.forEach(function(el) {
+          el.classList.add(`is-visible`);
+        });
+      }
+    });
+  </script>
+</body>
+</html>
